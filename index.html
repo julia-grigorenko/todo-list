@@ -45,15 +45,16 @@
                         this.items = newItems;
 
                         localStorage.setItem('items', JSON.stringify(this.items));
-                    },
-                    ready: function () {
-                        this.items = JSON.parse(localStorage.getItem('items')) || [];
                     }
-                }
-            });
+                  },
+                  ready: function () {
+                      this.items = JSON.parse(localStorage.getItem('items')) || [];
+                  }
+
+              });
         </script>
 
 
-        
+
     </body>
 </html>
