@@ -9,7 +9,7 @@
         <div class="todo-list">
             <p v-if="!items.length">No items</p>
             <ul v-if="items.length">
-                <li v-for="item in items">{{ item.name }} - <a href="#" v-on:click="removeItem(item)">Remove</a></li>
+                <li v-for="item in items">{{ item.title }} - <a href="#" v-on:click="removeItem(item)">Remove</a></li>
             </ul>
 
             <input type="text" v-model="item">
@@ -29,11 +29,21 @@
                     addItem: function () {
                         var item = {
                             id: Date.now(),
-                            name: this.item
+                            title: this.item,
+                            temporary: true
                         };
 
                         this.items.push(item);
-                        localStorage.setItem('items', JSON.stringify(this.items));
+                        //localStorage.setItem('items', JSON.stringify(this.items));
+
+                        $.ajax({
+                          url:'todo.php',
+                          type:'post',
+                          cache: false,
+                          data: {
+                            title: this.item
+                          }
+                        });
 
                         this.item = '';
                     },
@@ -44,14 +54,36 @@
 
                         this.items = newItems;
 
-                        localStorage.setItem('items', JSON.stringify(this.items));
-                    }
+                        //localStorage.setItem('items', JSON.stringify(this.items));
+                        if (!item.temporary) {
+                          $.ajax({
+                            url: 'todo.php',
+                            type: 'delete',
+                            cache: false,
+                            data: {
+                              id: item.id
+                            }
+                          });
+                        }
+                      }
                   },
-                  ready: function () {
-                      this.items = JSON.parse(localStorage.getItem('items')) || [];
-                  }
+                    ready:
+                      // function () {
+                      //     this.items = JSON.parse(localStorage.getItem('items')) || [];
+                      // }// function () {
+                      //     this.items = JSON.parse(localStorage.getItem('items')) || [];
+                      // }
+                      function () {
+                        $.ajax({
+                          url: 'todo.php',
+                          type: 'get',
+                          cache: false
+                        }).success(function (data) {
+                          this.items = data;
+                        }.bind(this));
+                      }
 
-              });
+            });
         </script>
 
 
